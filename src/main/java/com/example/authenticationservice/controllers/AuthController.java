@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController()
 @RequestMapping("/Auth")
@@ -63,4 +60,26 @@ public class AuthController {
         }
 
     };
+
+    @GetMapping("/validate")
+    public Boolean validateToken(@RequestParam String token) {
+        return authService.validate(token);
+    }
+
+    @PostMapping("/Logout")
+    public ResponseEntity<LoginResponseDto> Logout(@RequestBody LoginRequestDto loginRequestDto) {
+        LoginResponseDto loginResponseDto = new LoginResponseDto();
+        try {
+            if (authService.logout(loginRequestDto.getEmail())) {
+                loginResponseDto.setStatus(RequestStatus.SUCCESS);
+                loginResponseDto.setMessage("Successfully Logged Out");
+                return ResponseEntity.ok(loginResponseDto);
+            }
+        } catch(UserNotFoundException e){
+            loginResponseDto.setStatus(RequestStatus.FAILURE);
+            loginResponseDto.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(loginResponseDto);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(loginResponseDto);
+    }
 }
