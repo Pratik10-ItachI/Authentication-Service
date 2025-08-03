@@ -1,5 +1,5 @@
 package com.example.authenticationservice.security.services;
-
+import java.util.stream.Collectors;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -169,6 +169,17 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
         return builder.build();
     }
 
+    private Map<String, Object> filterSimpleAttributes(Map<String, Object> attributes) {
+        System.out.println("Filtering attributes: " + attributes);
+        return attributes.entrySet().stream()
+                .filter(e -> e.getKey().equals("authorization_request") ||
+                        e.getValue() == null ||
+                        e.getValue() instanceof String ||
+                        e.getValue() instanceof Number ||
+                        e.getValue() instanceof Boolean)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     private Authorization toEntity(OAuth2Authorization authorization) {
         Authorization entity = new Authorization();
         entity.setId(authorization.getId());
@@ -176,7 +187,7 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
         entity.setPrincipalName(authorization.getPrincipalName());
         entity.setAuthorizationGrantType(authorization.getAuthorizationGrantType().getValue());
         entity.setAuthorizedScopes(StringUtils.collectionToDelimitedString(authorization.getAuthorizedScopes(), ","));
-        entity.setAttributes(writeMap(authorization.getAttributes()));
+        entity.setAttributes(writeMap(filterSimpleAttributes(authorization.getAttributes())));
         entity.setState(authorization.getAttribute(OAuth2ParameterNames.STATE));
 
         OAuth2Authorization.Token<OAuth2AuthorizationCode> authorizationCode =

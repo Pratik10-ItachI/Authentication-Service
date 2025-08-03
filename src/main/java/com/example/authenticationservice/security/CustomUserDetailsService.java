@@ -12,12 +12,10 @@ import java.util.Optional;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private UserRepository userRepository;
-    private String username;
 
-    public CustomUserDetailsService(CustomUserDetails customUserDetails, UserRepository userRepository) {
+
+    public CustomUserDetailsService(  UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.username = customUserDetails.getUsername();
-
 
     }
 

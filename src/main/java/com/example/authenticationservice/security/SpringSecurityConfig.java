@@ -97,10 +97,7 @@ public class SpringSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-
-        CustomUserDetails customUserDetails = null;
-
-        return new CustomUserDetailsService(customUserDetails,userRepository);
+        return new CustomUserDetailsService(userRepository);
     }
 
 //    @Bean
